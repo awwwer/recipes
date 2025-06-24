@@ -106,3 +106,7 @@ And join the Nx community:
 npx nx serve client
 
 npx nx serve api
+
+
+
+docker compose up --build

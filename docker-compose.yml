@@ -1,0 +1,26 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: api-runner
+    ports:
+      - "3000:3000"
+    #volumes:
+      # Optional: Mount node_modules for faster local development if you are frequently rebuilding
+      # - /app/node_modules # Comment this out for production deployment
+    environment:
+      NODE_ENV: production # Ensure NestJS runs in production mode
+
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: client-runner
+    ports:
+      - "4200:80" # Map host port 4200 to container's port 80 (default for Nginx)
+    depends_on:
+      - api # Ensure the API service starts before the client
