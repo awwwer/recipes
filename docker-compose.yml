@@ -1,5 +1,5 @@
 # docker-compose.yml
-version: '3.8'
+# version: '3.8'
 
 services:
   api:
@@ -24,3 +24,42 @@ services:
       - "4200:80" # Map host port 4200 to container's port 80 (default for Nginx)
     depends_on:
       - api # Ensure the API service starts before the client
+
+  api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: api-dev
+    ports:
+      - "3001:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/dist
+    environment:
+      NX_DAEMON: 'false'
+      CHOKIDAR_USEPOLLING: 'true'
+      CHOKIDAR_INTERVAL: '100'
+      FORCE_COLOR: '1'
+      WATCHPACK_POLLING: 'true'
+    command: npx nodemon --legacy-watch --watch apps/api/src --ext ts,js,json --exec "npx nx serve api --host=0.0.0.0"
+    # Use CMD from Dockerfile for dev
+
+  client-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: client-dev
+    ports:
+      - "4201:4200"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/dist
+    depends_on:
+      - api-dev
+    environment:
+      CHOKIDAR_USEPOLLING: 'true'
+      FORCE_COLOR: '1'
+      WATCHPACK_POLLING: 'true'
+    # Use CMD from Dockerfile for dev
